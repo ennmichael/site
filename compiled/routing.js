@@ -1,76 +1,84 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require("fs");
-const path = require("path");
-class MimeMap {
-    constructor(defaultContentType) {
+var fs = require("fs");
+var path = require("path");
+var typescript_map_1 = require("typescript-map");
+var MimeMap = (function () {
+    function MimeMap(defaultContentType) {
+        var _this = this;
         this.defaultContentType = defaultContentType;
-        this.addMapping = (extension, contentType) => {
-            this.extensionToTypeMap.set(extension, contentType);
-            return this;
+        this.addMapping = function (extension, contentType) {
+            _this.extensionToTypeMap.set(extension, contentType);
+            return _this;
         };
-        this.getTypeForFile = (fileName) => this.extensionToTypeMap.get(path.extname(fileName)) || this.defaultContentType;
-        this.extensionToTypeMap = new Map();
+        this.getTypeForFile = function (fileName) { return _this.extensionToTypeMap.get(path.extname(fileName)) || _this.defaultContentType; };
+        this.extensionToTypeMap = new typescript_map_1.TSMap();
     }
-}
-MimeMap.defaultingTo = (contentType) => new MimeMap(contentType);
+    MimeMap.defaultingTo = function (contentType) { return new MimeMap(contentType); };
+    return MimeMap;
+}());
 exports.MimeMap = MimeMap;
-class Router {
-    constructor(coreFiles, mimeMap) {
+var Router = (function () {
+    function Router(coreFiles, mimeMap) {
+        var _this = this;
         this.coreFiles = coreFiles;
         this.mimeMap = mimeMap;
-        this.allowAccessToFile = (fileNamePattern) => {
-            this.allowedFilePatterns.push(new RegExp('/' + fileNamePattern));
-            return this;
+        this.allowAccessToFile = function (fileNamePattern) {
+            _this.allowedFilePatterns.push(new RegExp('/' + fileNamePattern));
+            return _this;
         };
-        this.handleRequest = (url, response) => {
+        this.handleRequest = function (url, response) {
             if (url == '/') {
-                serveFileFromWorkingDirectory(this.coreFiles.gameFile, 'text/html', response);
+                serveFileFromWorkingDirectory(_this.coreFiles.gameFile, 'text/html', response);
             }
             else if (url == '/favicon.ico') {
                 serveFileFromWorkingDirectory('favicon.ico', 'image/x-icon', response);
             }
             else {
-                this.tryServingRawFile(url, response);
+                _this.tryServingRawFile(url, response);
             }
         };
-        this.tryServingRawFile = (url, response) => {
-            console.log(url);
-            console.log(this.allowedFilePatterns.find((filePattern) => filePattern.test(url)));
-            if (this.allowedFilePatterns.find((filePattern) => filePattern.test(url))) {
-                this.serveFile(url, response);
+        this.tryServingRawFile = function (url, response) {
+            if (_this.isFileAllowed(url)) {
+                _this.serveFile(url, response);
             }
             else {
-                this.serveFile(this.coreFiles.badRequestFile, response);
+                _this.serveFile(_this.coreFiles.badRequestFile, response);
             }
         };
-        this.serveFile = (fileName, response) => {
-            serveFileFromWorkingDirectory(fileName, this.mimeMap.getTypeForFile(fileName), response);
+        this.isFileAllowed = function (filename) {
+            for (var _i = 0, _a = _this.allowedFilePatterns; _i < _a.length; _i++) {
+                var pattern = _a[_i];
+                if (pattern.test(filename))
+                    return true;
+            }
+            return false;
+        };
+        this.serveFile = function (fileName, response) {
+            serveFileFromWorkingDirectory(fileName, _this.mimeMap.getTypeForFile(fileName), response);
         };
         this.allowedFilePatterns = [];
     }
-}
+    return Router;
+}());
 exports.Router = Router;
-const serveFileFromWorkingDirectory = (file, contentType, response) => {
-    const onFileRead = (content) => {
+var serveFileFromWorkingDirectory = function (file, contentType, response) {
+    var onFileRead = function (content) {
         response.writeHead(200, { 'Content-Type': contentType });
         response.write(content);
         response.end();
     };
-    const onError = (err) => {
+    var onError = function (err) {
         console.log("Error reading file.");
         console.log(err);
         response.end();
     };
-    const fileReadPromise = new Promise((resolve, reject) => {
-        fs.readFile('./' + file, (err, content) => {
-            if (err)
-                reject(err);
-            else
-                resolve(content);
-        });
+    fs.readFile('./' + file, function (err, content) {
+        if (err) {
+            onError(err);
+        }
+        else {
+            onFileRead(content);
+        }
     });
-    fileReadPromise
-        .then(onFileRead)
-        .catch(onError);
 };

@@ -1,6 +1,7 @@
 import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
+import { TSMap } from 'typescript-map';
 
 export interface CoreRouterFiles {
     badRequestFile: string;
@@ -20,7 +21,7 @@ export class MimeMap {
     
     public readonly getTypeForFile = (fileName: string): string => this.extensionToTypeMap.get(path.extname(fileName)) || this.defaultContentType;
     
-    private readonly extensionToTypeMap = new Map<string, string>();
+    private readonly extensionToTypeMap = new TSMap<string, string>();
 }
 
 export class Router {    
@@ -43,15 +44,18 @@ export class Router {
     }
     
     private readonly tryServingRawFile = (url: string, response: http.ServerResponse) => {
-        console.log(url);
-        console.log(this.allowedFilePatterns.find((filePattern) => filePattern.test(url)));
-        
-        if (this.allowedFilePatterns.find((filePattern) => filePattern.test(url))) {
+        if (this.isFileAllowed(url)) {
             this.serveFile(url, response);
         }
         else {
             this.serveFile(this.coreFiles.badRequestFile, response);
         }
+    }
+    
+    private readonly isFileAllowed = (filename: string): boolean => {
+        for (let pattern of this.allowedFilePatterns)
+            if (pattern.test(filename)) return true;
+        return false;
     }
     
     private readonly serveFile = (fileName: string, response: http.ServerResponse) => {
@@ -74,14 +78,11 @@ const serveFileFromWorkingDirectory = (file: string, contentType: string, respon
         response.end();
     }
     
-    const fileReadPromise = new Promise<Buffer>((resolve, reject) => {
-        fs.readFile('./'+file, (err, content) => {
-            if (err) reject(err);
-            else resolve(content);
-        });
+    fs.readFile('./'+file, (err, content) => {
+        if (err) {
+            onError(err);
+        } else {
+            onFileRead(content);
+        }
     });
-    
-    fileReadPromise
-        .then(onFileRead)
-        .catch(onError);
 }

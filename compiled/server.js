@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const http = require("http");
-exports.start = (port, router) => {
-    const onRequest = (request, response) => {
+var http = require("http");
+exports.start = function (port, router) {
+    var onRequest = function (request, response) {
         if (request.url)
             router.handleRequest(request.url, response);
     };
