@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "start": "npm run build:live",
+    "build:live": "nodemon --exec ./node_modules/.bin/ts-node.cmd -- ./index.ts"
+  },
+  "name": "ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "compiled/index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/es6-promise": "0.0.32",
+    "@types/node": "^7.0.28",
+    "jsdom": "^11.0.0",
+    "node-dom": "^0.1.0",
+    "request": "^2.81.0",
+    "typescript": "^2.3.4"
+  }
+}
