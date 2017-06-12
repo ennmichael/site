@@ -1,18 +1,25 @@
 "use strict";
 /// <reference path="pixi.js.d.ts"/>
-var app = new PIXI.Application({
-    width: 300, height: 300,
-    backgroundColor: 0xFFFFFF
-});
-PIXI.loader.add('pepe', './pepe.png').load(function (_, resources) {
-    var sprite = new PIXI.Sprite(resources.pepe.texture);
-    sprite.x = app.screen.width / 2;
-    sprite.y = app.screen.height / 2;
-    sprite.anchor.x = 0.5;
-    sprite.anchor.y = 0.5;
-    app.stage.addChild(sprite);
-    app.ticker.add(function () {
-        sprite.rotation += 0.01;
-    });
-});
+/// <reference path="graphics.ts"/>
+var app = new Graphics.AutoSizedApp(window, { backgroundColor: Utils.Colors.white });
 document.body.appendChild(app.view);
+Utils.runTests();
+Logic.runTests();
+console.log('Tests ran');
+var game = new Logic.GameOfLife(Logic.getConwaysRules(), Logic.createCells(Logic.GameOfLife.boardSize, [
+    { x: 0, y: 2 },
+    { x: 1, y: 1 },
+    { x: 2, y: 1 }
+]));
+var counter = 0;
+PIXI.
+;
+new PIXI.Sprite().on('click', function () {
+});
+app.ticker.add(function () {
+    ++counter;
+    if (counter % 10 == 0) {
+        Graphics.drawCells(game.readonlyCellArray, app);
+        game.advanceGeneration();
+    }
+});
