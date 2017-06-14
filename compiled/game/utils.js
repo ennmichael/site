@@ -17,6 +17,7 @@ var Utils;
             y: Math.abs(p1.y - p2.y),
         };
     };
+    // Maybe all these array utils should share a namespace
     Utils.filterArray = function (array, predicate) {
         var result = [];
         for (var _i = 0, array_1 = array; _i < array_1.length; _i++) {
@@ -32,15 +33,22 @@ var Utils;
             array.pop();
         }
     };
-    Utils.defaultComparer = function (a, b) { return a == b; };
-    Utils.arrayContains = function (haystack, needle, equalityComparer) {
-        if (equalityComparer === void 0) { equalityComparer = Utils.defaultComparer; }
-        for (var _i = 0, haystack_1 = haystack; _i < haystack_1.length; _i++) {
-            var elem = haystack_1[_i];
-            if (equalityComparer(elem, needle))
-                return true;
+    Utils.operatorEqualsComparer = function (a, b) { return a == b; };
+    Utils.indexOfElement = function (array, elem, equalityComparer) {
+        if (equalityComparer === void 0) { equalityComparer = Utils.operatorEqualsComparer; }
+        for (var i = 0; i < array.length; ++i) {
+            if (equalityComparer(array[i], elem))
+                return i;
         }
-        return false;
+        return -1;
+    };
+    Utils.arrayContains = function (haystack, needle, equalityComparer) {
+        if (equalityComparer === void 0) { equalityComparer = Utils.operatorEqualsComparer; }
+        return Utils.indexOfElement(haystack, needle, equalityComparer) != -1;
+    };
+    Utils.removeFromArray = function (array, elem, equalityComparer) {
+        if (equalityComparer === void 0) { equalityComparer = Utils.operatorEqualsComparer; }
+        array.splice(Utils.indexOfElement(array, elem, equalityComparer), 1);
     };
     Utils.allPointsUpTo = function (limit) {
         var result = [];
@@ -50,6 +58,13 @@ var Utils;
             }
         }
         return result;
+    };
+    Utils.valueIsInRange = function (value, range) { return value >= range.from && value <= range.to; };
+    Utils.range = function (from, to) {
+        return {
+            from: from,
+            to: to
+        };
     };
     // Fuck off
     var testPointsAreBesides = function () {
@@ -120,11 +135,26 @@ var Utils;
         console.assert(Utils.arrayContains(numbers, 2), "2 contained in " + numbers + ", but arrayContains returns false");
         console.assert(!Utils.arrayContains(numbers, 1024), "1024 not contained in " + numbers + ", but arrayContains returns true");
     };
+    var testRemoveFromArray = function () {
+        var numbers = [1, 2, 3, 5, 6, 8, 12, 15];
+        var elemToRemove = 3;
+        Utils.removeFromArray(numbers, elemToRemove);
+        console.assert(!Utils.arrayContains(numbers, elemToRemove), 'Array still contains removed element ' + elemToRemove);
+    };
+    var testRange = function () {
+        var numbers = Utils.range(0, 10);
+        console.assert(Utils.valueIsInRange(5, numbers), 'Value is in range, yet valueIsInRange returns false');
+        console.assert(Utils.valueIsInRange(3, numbers), 'Value is in range, yet valueIsInRange returns false');
+        console.assert(Utils.valueIsInRange(10, numbers), 'Edge case value is in range, yet valueIsInRange returns false');
+        console.assert(Utils.valueIsInRange(0, numbers), 'Edge case value is in range, yet valueIsInRange returns false');
+    };
     Utils.runTests = function () {
         testPointsAreBesides();
         testPointsAreEqual();
         testFilterArray();
         testClearArray();
         testArrayContains();
+        testRemoveFromArray();
+        testRange();
     };
 })(Utils || (Utils = {}));

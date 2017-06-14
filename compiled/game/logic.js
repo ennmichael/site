@@ -3,21 +3,21 @@
 var Logic;
 (function (Logic) {
     var GameOfLife = (function () {
-        function GameOfLife(rules, cells) {
+        function GameOfLife(rules_, cells) {
             var _this = this;
-            this.rules = rules;
+            this.rules_ = rules_;
             this.advanceGeneration = function () {
-                for (var _i = 0, _a = _this.rules; _i < _a.length; _i++) {
+                for (var _i = 0, _a = _this.rules_; _i < _a.length; _i++) {
                     var rule = _a[_i];
-                    _this.cellsTable.addSnapshotForRule(rule);
+                    _this.cellsTable_.addSnapshotForRule(rule);
                 }
-                _this.cellsTable.applyRuleSnapshots();
+                _this.cellsTable_.applyRuleSnapshots();
             };
-            this.cellsTable = new CellsTable(cells);
+            this.cellsTable_ = new CellsTable(cells);
         }
-        Object.defineProperty(GameOfLife.prototype, "readonlyCells", {
+        Object.defineProperty(GameOfLife.prototype, "cells", {
             get: function () {
-                return this.cellsTable.readonlyCells;
+                return this.cellsTable_.cells;
             },
             enumerable: true,
             configurable: true
@@ -36,18 +36,18 @@ var Logic;
         return result;
     };
     var CellsTable = (function () {
-        function CellsTable(cells) {
+        function CellsTable(cells_) {
             var _this = this;
-            this.cells = cells;
+            this.cells_ = cells_;
             this.addSnapshotForRule = function (rule) {
-                _this.ruleSnapshots.push({
+                _this.ruleSnapshots_.push({
                     targetCells: _this.getTargetCellsForRule(rule),
                     newCellState: rule.newCellState
                 });
             };
             this.getTargetCellsForRule = function (rule) {
                 var result = [];
-                for (var _i = 0, _a = _this.cells; _i < _a.length; _i++) {
+                for (var _i = 0, _a = _this.cells_; _i < _a.length; _i++) {
                     var cell = _a[_i];
                     var neighbourCount = _this.getNeighbourCountForCell(cell);
                     if (rule.appliesToNeighbourCount(neighbourCount) && rule.targetCellState == cell.state) {
@@ -61,25 +61,25 @@ var Logic;
                 var neighbourCells = Utils.filterArray(liveCells, function (cell) { return cellsAreNeighbours(cell, centerCell); });
                 return neighbourCells.length;
             };
-            this.getLiveCells = function () { return Utils.filterArray(_this.cells, Logic.cellIsAlive); };
+            this.getLiveCells = function () { return Utils.filterArray(_this.cells_, Logic.cellIsAlive); };
             this.applyRuleSnapshots = function () {
-                for (var _i = 0, _a = _this.ruleSnapshots; _i < _a.length; _i++) {
+                for (var _i = 0, _a = _this.ruleSnapshots_; _i < _a.length; _i++) {
                     var snapshot = _a[_i];
                     _this.applyRuleSnapshot(snapshot);
                 }
-                Utils.clearArray(_this.ruleSnapshots);
+                Utils.clearArray(_this.ruleSnapshots_);
             };
             this.applyRuleSnapshot = function (snapshot) {
                 for (var _i = 0, _a = snapshot.targetCells; _i < _a.length; _i++) {
                     var cell = _a[_i];
-                    _this.cells[_this.cells.indexOf(cell)] = { state: snapshot.newCellState, position: cell.position };
+                    _this.cells_[_this.cells_.indexOf(cell)] = { state: snapshot.newCellState, position: cell.position };
                 }
             };
-            this.ruleSnapshots = [];
+            this.ruleSnapshots_ = [];
         }
-        Object.defineProperty(CellsTable.prototype, "readonlyCells", {
+        Object.defineProperty(CellsTable.prototype, "cells", {
             get: function () {
-                return this.cells;
+                return this.cells_;
             },
             enumerable: true,
             configurable: true
@@ -119,5 +119,6 @@ var Logic;
     })(AutomationRules || (AutomationRules = {}));
     // Fuck you
     Logic.runTests = function () {
+        // Tests please
     };
 })(Logic || (Logic = {}));

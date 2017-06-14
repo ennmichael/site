@@ -13,6 +13,7 @@ var router = new routing.Router({ badRequestFile: 'badrequest.html', gameFile: '
     .allowAccessToFile('compiled/game/graphics.js')
     .allowAccessToFile('compiled/game/logic.js')
     .allowAccessToFile('compiled/game/utils.js')
+    .allowAccessToFile('compiled/game/input.js')
     .allowAccessToFile('img/bunny.png');
 server.start(8000, router);
 console.log("Server started");
