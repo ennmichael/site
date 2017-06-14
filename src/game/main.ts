@@ -13,7 +13,7 @@
         });
     }
     
-    const testing = true;
+    const testing = false;
     
     if (testing) {
         Utils.runTests();

@@ -12,7 +12,7 @@
             ++counter;
         });
     };
-    var testing = true;
+    var testing = false;
     if (testing) {
         Utils.runTests();
         Logic.runTests();
