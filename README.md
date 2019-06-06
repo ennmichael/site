@@ -1,6 +1,6 @@
 # typescript-game-of-life
 
-Left click to toggle weather a cell at a certain position is alive, enter to start the simulation.
+Left click to toggle whether a cell at a certain position is alive, enter to start the simulation.
 
 ## Running
 
